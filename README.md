@@ -1,5 +1,7 @@
 # AI Knowledge Atlas / AI 学习知识索引
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/coldish666/ai-knowledge-atlas)
+
 AI Knowledge Atlas 是一个 React/Vite + FastAPI 的 AI 知识索引系统。它用知识树、知识图谱、交互教材、RAG 问答和权威资源库，把 AI 从数学基础到大模型、Agent、工程化与前沿方向组织成可浏览、可搜索、可部署的知识地图。
 
 ## 功能概览
@@ -170,14 +172,14 @@ docker compose up --build
 
 ## Render 部署
 
-仓库已包含 `Dockerfile` 和 `render.yaml`。推荐用 Docker Web Service。
+仓库已包含 `Dockerfile` 和 `render.yaml`。推荐先用 Render 免费 Web Service 跑通公网演示。
 
 Blueprint 方式：
 
 1. 将仓库推送到 GitHub。
-2. 在 Render 选择 New Blueprint，指向该仓库。
+2. 点击 README 顶部的 Deploy to Render 按钮，或在 Render 选择 New Blueprint，指向该仓库。
 3. Render 会读取根目录 `render.yaml`。
-4. 确认持久化磁盘挂载到 `/app/data`。
+4. 确认服务名和环境变量。
 5. 部署后访问 Render 分配的公网 URL。
 
 手动 Web Service 方式：
@@ -186,15 +188,20 @@ Blueprint 方式：
 - Build Command：Docker 服务不需要手写，Render 使用 `Dockerfile`
 - Start Command：Docker 服务使用镜像内 CMD：`uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 - Health Check Path：`/health`
+- Plan：Free 可用于演示；长期保存数据建议升级并配置持久化存储。
 - Environment Variables：
   - `DATA_DIR=/app/data`
   - `UPLOAD_DIR=/app/data/uploads`
   - `FRONTEND_DIST_DIR=/app/frontend/dist`
   - `LLM_PROVIDER=mock`
-  - `CORS_ORIGINS=https://你的-render域名`
-- Persistent Disk：
-  - Mount Path：`/app/data`
-  - SQLite 数据库和上传文件都在这里。
+  - `CORS_ORIGINS=*`
+
+免费部署注意事项：
+
+- Free Web Service 的本地文件系统不是长期持久化存储。
+- SQLite 数据库会在容器生命周期内可用，但重建或休眠恢复后不保证保留。
+- 上传的 RAG 文件同样不适合长期保存。
+- 如果要长期使用上传资料和个人数据，请升级 Render 实例并配置 Persistent Disk，挂载路径为 `/app/data`，或改用 PostgreSQL + 对象存储。
 
 如果使用 Render PostgreSQL：
 
