@@ -1,0 +1,20 @@
+services:
+  ai-knowledge-atlas:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATA_DIR: /app/data
+      UPLOAD_DIR: /app/data/uploads
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      LLM_PROVIDER: mock
+    volumes:
+      - atlas_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  atlas_data:
